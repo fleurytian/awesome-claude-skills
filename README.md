@@ -3,7 +3,7 @@
 <div align="center">
 
 [![Author](https://img.shields.io/badge/Author-Fleury-blue)](https://github.com/fleurytian)
-[![小红书](https://img.shields.io/badge/小红书-@如宝｜AI&Analytics-red)](https://www.xiaohongshu.com)
+[![小红书](https://img.shields.io/badge/小红书-@如宝｜AI&Analytics-red)](https://www.xiaohongshu.com/user/profile/56d1a32184edcd71a06dcc55?xsec_token=ABZohenXDHnRbNau0jBvZWdjPAZ3gXdQw3bGs0cbzgNms%3D&xsec_source=pc_search)
 [![Email](https://img.shields.io/badge/Email-fleurytian@gmail.com-green)](mailto:fleurytian@gmail.com)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
