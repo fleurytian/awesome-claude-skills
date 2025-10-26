@@ -1,4 +1,4 @@
-# Claude Skills by Fleury
+# Claude Skills by Fleury 如宝
 
 <div align="center">
 
