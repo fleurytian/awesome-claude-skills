@@ -6,7 +6,7 @@ metadata:
   author: Qianru Tian
   email: fleurytian@gmail.com
   social: 小红书@如宝｜AI&Analytics
-  GitHub:fleurytian
+  GitHub: fleurytian
   version: "3.1"
   last_updated: "2025-10-26"
   architecture: "Progressive Disclosure + Dependency-Aware"
