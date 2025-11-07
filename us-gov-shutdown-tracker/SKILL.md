@@ -1,6 +1,11 @@
 ---
 name: us-gov-shutdown-tracker
 description: Track and analyze US government shutdown liquidity impacts by monitoring TGA (Treasury General Account), bank reserves, EFFR, and SOFR data from FRED API. Use when user wants to (1) analyze current or past government shutdown effects on financial markets, (2) track liquidity conditions during fiscal policy disruptions, (3) assess "stealth tightening" effects, (4) compare shutdown episodes across different monetary policy regimes (QE vs QT), or (5) generate liquidity stress reports with historical context. Recommended usage frequency is weekly on Wednesdays after TGA/reserve data releases.
+metadata:
+  author: Qianru Tian
+  email: fleurytian@gmail.com
+  social: 小红书@如宝｜AI&Analytics
+  GitHub: fleurytian
 ---
 
 # US Government Shutdown Liquidity Tracker
