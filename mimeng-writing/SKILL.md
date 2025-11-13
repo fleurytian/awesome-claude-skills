@@ -5,7 +5,7 @@ metadata:
   author: Qianru Tian
   email: fleurytian@gmail.com
   social: 小红书@如宝｜AI&Analytics
-  GitHub:fleurytian
+  GitHub: fleurytian
 ---
 
 # 咪蒙写作技巧 - 10万+爆款文章创作指南
