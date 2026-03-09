@@ -239,6 +239,21 @@ awesome-claude-skills/
 
 ---
 
+### 4️⃣ X/Twitter Data Skill (x-twitter-scraper)
+**X/Twitter data skill — MCP server, REST API, 20 extraction tools, account monitoring.**
+
+Install: `npx x-twitter-scraper@latest init`
+
+**Source:** [Xquik-dev/x-twitter-scraper](https://github.com/Xquik-dev/x-twitter-scraper)
+
+#### 🚀 快速开始
+
+```
+npx x-twitter-scraper@latest init
+```
+
+---
+
 ## 📈 更新日志
 
 ### McKinsey Consultant
