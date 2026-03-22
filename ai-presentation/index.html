@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI工作方式重构 | 阶段性梳理</title>
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --bg2: #141414;
+    --bg3: #1c1c1c;
+    --border: #2a2a2a;
+    --text: #e8e8e8;
+    --muted: #666;
+    --accent: #c8f064;
+    --accent2: #64b5f6;
+    --accent3: #f06464;
+    --font: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-snap-type: y mandatory; overflow-y: scroll; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* ── Slide base ── */
+  .slide {
+    min-height: 100vh;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 120px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .slide-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 40px;
+  }
+
+  /* ── Nav ── */
+  nav {
+    position: fixed;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+  }
+
+  nav a {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    display: block;
+    transition: all .2s;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  nav a:hover, nav a.active { background: var(--accent); transform: scale(1.5); }
+
+  /* ── 破题 ── */
+  #s0 { background: var(--bg); }
+
+  .hero-tag {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+
+  .hero-title {
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -1px;
+    max-width: 800px;
+    margin-bottom: 24px;
+  }
+
+  .hero-title span { color: var(--accent); }
+
+  .hero-sub {
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.7;
+  }
+
+  .hero-meta {
+    position: absolute;
+    bottom: 60px;
+    left: 120px;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  /* ── Ch1 Tools ── */
+  #s1 { background: var(--bg); }
+
+  .ch-header {
+    margin-bottom: 56px;
+  }
+
+  .ch-num {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .ch-title {
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    max-width: 960px;
+  }
+
+  .tool-card {
+    background: var(--bg2);
+    padding: 28px 32px;
+    border: 1px solid var(--border);
+    transition: border-color .2s;
+  }
+
+  .tool-card:hover { border-color: var(--accent); }
+
+  .tool-name {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+
+  .tool-use {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .tool-tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 2px;
+    background: var(--bg3);
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+
+  /* ── Ch2 实践 ── */
+  #s2 { background: var(--bg); align-items: flex-start; }
+
+  .thread-line {
+    margin-top: 48px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    border: 1px solid var(--accent);
+    font-size: 14px;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+  }
+
+  .practices-table {
+    width: 100%;
+    max-width: 1000px;
+    border-collapse: collapse;
+    margin-top: 40px;
+  }
+
+  .practices-table th {
+    text-align: left;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    padding: 0 24px 16px 0;
+    border-bottom: 1px solid var(--border);
+    font-weight: 400;
+    text-transform: uppercase;
+  }
+
+  .practices-table td {
+    padding: 18px 24px 18px 0;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .practices-table tr:hover td { background: var(--bg2); }
+
+  .tier-badge {
+    display: inline-block;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 2px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .tier-eff { background: #1a2a0a; color: var(--accent); }
+  .tier-auto { background: #0a1a2a; color: var(--accent2); }
+  .tier-sys { background: #2a1a0a; color: #f0a564; }
+  .tier-km { background: #1a0a2a; color: #c864f0; }
+
+  .case-name { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+  .case-detail { font-size: 12px; color: var(--muted); }
+  .tool-pill {
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--bg3);
+    padding: 4px 10px;
+    border-radius: 2px;
+    display: inline-block;
+  }
+  .value-text { font-size: 13px; color: var(--text); }
+
+  /* ── Ch3 质量 ── */
+  #s3 { background: var(--bg); }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    max-width: 960px;
+    margin-top: 48px;
+  }
+
+  .insight-block {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 32px;
+  }
+
+  .insight-block h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 16px;
+    letter-spacing: 0.5px;
+  }
+
+  .chain {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .chain-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text);
+  }
+
+  .chain-item:last-child { border-bottom: none; }
+
+  .chain-arrow {
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-size: 12px;
+  }
+
+  .quality-point {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .quality-point:last-child { border-bottom: none; }
+
+  .dot { color: var(--accent2); flex-shrink: 0; margin-top: 4px; }
+
+  /* ── Ch4 关键认知 ── */
+  #s4 { background: var(--bg); }
+
+  .cognitions {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2px;
+    max-width: 960px;
+    margin-top: 48px;
+  }
+
+  .cog-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 32px;
+  }
+
+  .cog-num {
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--border);
+    line-height: 1;
+    margin-bottom: 24px;
+  }
+
+  .cog-title { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--accent); }
+  .cog-body { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+  .transform-arrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    margin-top: 16px;
+    color: var(--text);
+  }
+
+  .from { color: var(--muted); }
+  .arr { color: var(--accent); }
+  .to { color: var(--text); font-weight: 500; }
+
+  /* ── Ch5 用户故事 ── */
+  #s5 { background: var(--bg); }
+
+  .stories {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2px;
+    max-width: 960px;
+    margin-top: 48px;
+  }
+
+  .story-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .story-role {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .story-compare {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .compare-row {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 12px;
+    align-items: start;
+    font-size: 13px;
+  }
+
+  .compare-label {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding-top: 2px;
+  }
+
+  .compare-before { color: var(--muted); }
+  .compare-after { color: var(--text); font-weight: 500; }
+
+  .story-impact {
+    font-size: 12px;
+    color: var(--accent2);
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    line-height: 1.6;
+  }
+
+  /* ── Ch6 风险 ── */
+  #s6 { background: var(--bg); }
+
+  .risks {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2px;
+    max-width: 960px;
+    margin-top: 48px;
+  }
+
+  .risk-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent3);
+    padding: 28px;
+  }
+
+  .risk-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+
+  .risk-body { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+  .risk-approach {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--accent);
+  }
+
+  /* ── Ch7 路线图 ── */
+  #s7 { background: var(--bg); }
+
+  .roadmap {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2px;
+    max-width: 960px;
+    margin-top: 48px;
+  }
+
+  .rm-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 28px;
+  }
+
+  .rm-phase {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .rm-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; color: var(--text); }
+
+  .rm-items { display: flex; flex-direction: column; gap: 8px; }
+
+  .rm-item {
+    font-size: 13px;
+    color: var(--muted);
+    display: flex;
+    gap: 10px;
+    line-height: 1.5;
+  }
+
+  .rm-bullet { color: var(--accent); flex-shrink: 0; }
+
+  .endline {
+    max-width: 960px;
+    margin-top: 40px;
+    padding: 24px 32px;
+    border: 1px solid var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .endline-label { font-size: 11px; color: var(--accent); letter-spacing: 2px; flex-shrink: 0; }
+  .endline-text { font-size: 16px; font-weight: 500; color: var(--text); }
+
+  /* ── Progress bar ── */
+  .progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: var(--accent);
+    transition: width .1s;
+    z-index: 200;
+  }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<nav id="nav">
+  <a href="#s0" title="开篇"></a>
+  <a href="#s1" title="工具坐标"></a>
+  <a href="#s2" title="做了什么"></a>
+  <a href="#s3" title="质量"></a>
+  <a href="#s4" title="关键认知"></a>
+  <a href="#s5" title="用户故事"></a>
+  <a href="#s6" title="风险与边界"></a>
+  <a href="#s7" title="路线图"></a>
+</nav>
+
+<!-- ── 破题 ── -->
+<section class="slide" id="s0">
+  <div class="hero-tag">阶段性梳理 · 2025</div>
+  <h1 class="hero-title">
+    我们帮客户<br>用数据做决策——<br><span>我们自己呢？</span>
+  </h1>
+  <p class="hero-sub">过去一年，我在用AI重构自己的工作方式。<br>这是一个诚实的梳理：做了什么，看到了什么，接下来往哪走。</p>
+  <div class="hero-meta">按 ↓ 继续 &nbsp;·&nbsp; 侧边点导航跳转</div>
+</section>
+
+<!-- ── Ch1 坐标系 ── -->
+<section class="slide" id="s1">
+  <div class="ch-header">
+    <div class="ch-num">Chapter 1</div>
+    <h2 class="ch-title">坐标系：我在用什么</h2>
+  </div>
+  <div class="tools-grid">
+    <div class="tool-card">
+      <div class="tool-name">Claude Code</div>
+      <div class="tool-use">分析 · 写作 · 深度思考</div>
+      <span class="tool-tag">主力</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">Trae</div>
+      <div class="tool-use">自动化脚本 · Excel处理</div>
+      <span class="tool-tag">执行层</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">Codex + 飞书MCP</div>
+      <div class="tool-use">数据→报告→飞书云文档</div>
+      <span class="tool-tag">系统集成</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">OpenClaw</div>
+      <div class="tool-use">多Agent协作 · 知识管理</div>
+      <span class="tool-tag">知识层</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">GenSpark</div>
+      <div class="tool-use">PPT · 格式输出</div>
+      <span class="tool-tag">呈现层</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">Obsidian</div>
+      <div class="tool-use">知识库 · 收藏→摘要→沉淀</div>
+      <span class="tool-tag">知识资产</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── Ch2 做了什么 ── -->
+<section class="slide" id="s2" style="padding-top: 60px;">
+  <div class="ch-header">
+    <div class="ch-num">Chapter 2</div>
+    <h2 class="ch-title">做了什么</h2>
+  </div>
+  <table class="practices-table">
+    <thead>
+      <tr>
+        <th style="width:100px">层级</th>
+        <th>案例</th>
+        <th style="width:160px">工具</th>
+        <th>核心价值</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="tier-badge tier-eff">效率提升</span></td>
+        <td>
+          <div class="case-name">述职报告 · 行业分析框架</div>
+          <div class="case-detail">节省约60%时间 · 可做更多场景分析</div>
+        </td>
+        <td><span class="tool-pill">Claude Code</span></td>
+        <td class="value-text">高质量文档生成</td>
+      </tr>
+      <tr>
+        <td><span class="tier-badge tier-eff">效率提升</span></td>
+        <td>
+          <div class="case-name">公司模板PPT</div>
+          <div class="case-detail">格式合规 · 结构先行</div>
+        </td>
+        <td><span class="tool-pill">GenSpark</span></td>
+        <td class="value-text">格式合规 + 速度</td>
+      </tr>
+      <tr>
+        <td><span class="tier-badge tier-auto">流程自动化</span></td>
+        <td>
+          <div class="case-name">预算Excel清洗 → Dashboard</div>
+          <div class="case-detail">2小时 → 30秒 · 可多轮迭代假设</div>
+        </td>
+        <td><span class="tool-pill">Trae</span></td>
+        <td class="value-text">可复用的固化技能</td>
+      </tr>
+      <tr>
+        <td><span class="tier-badge tier-sys">系统集成</span></td>
+        <td>
+          <div class="case-name">数据输入 → 报告 → 飞书云文档</div>
+          <div class="case-detail">打通工具链 · 零手动切换</div>
+        </td>
+        <td><span class="tool-pill">Codex + 飞书MCP</span></td>
+        <td class="value-text">打通工具链，零手动</td>
+      </tr>
+      <tr>
+        <td><span class="tier-badge tier-km">知识管理</span></td>
+        <td>
+          <div class="case-name">收藏夹 → 摘要 → Obsidian沉淀</div>
+          <div class="case-detail">多Agent协作 · 像找了个高成长实习生</div>
+        </td>
+        <td><span class="tool-pill">OpenClaw</span></td>
+        <td class="value-text">个人知识资产化</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="thread-line">
+    ◆ &nbsp;贯穿主线：我不写代码，但这些都是我跑通的。
+  </div>
+</section>
+
+<!-- ── Ch3 质量 ── -->
+<section class="slide" id="s3">
+  <div class="ch-header">
+    <div class="ch-num">Chapter 3</div>
+    <h2 class="ch-title">不只是快——质量也变了</h2>
+  </div>
+  <div class="two-col">
+    <div class="insight-block">
+      <h3>间接路径：时间红利的复利</h3>
+      <div class="chain">
+        <div class="chain-item">
+          <span class="chain-arrow">▸</span>
+          节省的时间，用来接触更多业务场景
+        </div>
+        <div class="chain-item">
+          <span class="chain-arrow">▸</span>
+          更多接触，带来更准确的业务判断
+        </div>
+        <div class="chain-item">
+          <span class="chain-arrow">▸</span>
+          更准的判断，让AI产出更有价值的输出
+        </div>
+        <div class="chain-item">
+          <span class="chain-arrow">▸</span>
+          形成复利——时间越省，判断越准，输出越好
+        </div>
+      </div>
+    </div>
+    <div class="insight-block">
+      <h3>直接作用：AI拉高质量下限</h3>
+      <div class="chain">
+        <div class="quality-point">
+          <span class="dot">◆</span>
+          不再有"赶时间粗糙"的状态——结构先行成为默认
+        </div>
+        <div class="quality-point">
+          <span class="dot">◆</span>
+          强制结构化思考：AI要求你先想清楚再输入
+        </div>
+        <div class="quality-point">
+          <span class="dot">◆</span>
+          质量下限抬高，好的时候更好，差的时候也不差
+        </div>
+        <div class="quality-point">
+          <span class="dot">◆</span>
+          关键数字仍人工比对——AI负责速度，我负责准确
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Ch4 关键认知 ── -->
+<section class="slide" id="s4">
+  <div class="ch-header">
+    <div class="ch-num">Chapter 4</div>
+    <h2 class="ch-title">关键认知</h2>
+  </div>
+  <div class="cognitions">
+    <div class="cog-card">
+      <div class="cog-num">01</div>
+      <div class="cog-title">角色在重定义</div>
+      <div class="cog-body">Finance BP的核心价值正在从处理数据转向提供判断。</div>
+      <div class="transform-arrow">
+        <span class="from">取数者</span>
+        <span class="arr">→</span>
+        <span class="to">判断者</span>
+        <span class="arr">→</span>
+        <span class="to">业务伙伴</span>
+      </div>
+    </div>
+    <div class="cog-card">
+      <div class="cog-num">02</div>
+      <div class="cog-title">Dashboard不是终点</div>
+      <div class="cog-body">从"看所有数字"到"回答具体问题"——这个方向的转变，AI让它变得可执行。</div>
+      <div class="transform-arrow">
+        <span class="from">铺数字</span>
+        <span class="arr">→</span>
+        <span class="to">回答问题</span>
+      </div>
+    </div>
+    <div class="cog-card">
+      <div class="cog-num">03</div>
+      <div class="cog-title">真正的护城河</div>
+      <div class="cog-body">给AI提供高质量context的能力——这不能被自动化，这是人的事。</div>
+      <div class="transform-arrow" style="margin-top: 24px;">
+        <span class="to" style="color: var(--accent);">业务理解 × AI执行</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Ch5 用户故事 ── -->
+<section class="slide" id="s5">
+  <div class="ch-header">
+    <div class="ch-num">Chapter 5 &nbsp;·&nbsp; 最重要的章节</div>
+    <h2 class="ch-title">谁真正受益</h2>
+  </div>
+  <div class="stories">
+    <div class="story-card">
+      <div class="story-role">销售经理</div>
+      <div class="story-compare">
+        <div class="compare-row">
+          <div class="compare-label">以前</div>
+          <div class="compare-before">季度复盘时才看到数据，滞后响应</div>
+        </div>
+        <div class="compare-row">
+          <div class="compare-label">现在</div>
+          <div class="compare-after">双周行动信号，mid-period调整有依据</div>
+        </div>
+      </div>
+      <div class="story-impact">多系统切换、手动选范围的dirty work被消化在工具链里，他不需要知道怎么跑的。</div>
+    </div>
+    <div class="story-card">
+      <div class="story-role">销售代表</div>
+      <div class="story-compare">
+        <div class="compare-row">
+          <div class="compare-label">以前</div>
+          <div class="compare-before">月底才知道奖金，行为改变太晚</div>
+        </div>
+        <div class="compare-row">
+          <div class="compare-label">现在</div>
+          <div class="compare-after">mid-period看到信号，可以在周期内调整行为</div>
+        </div>
+      </div>
+      <div class="story-impact">数据到行动的距离缩短——这才是Finance BP能创造的真实价值。</div>
+    </div>
+    <div class="story-card">
+      <div class="story-role">管理层</div>
+      <div class="story-compare">
+        <div class="compare-row">
+          <div class="compare-label">以前</div>
+          <div class="compare-before">问题问出来，"我回去查一下"</div>
+        </div>
+        <div class="compare-row">
+          <div class="compare-label">现在</div>
+          <div class="compare-after">当场响应，有观点，不只有数字</div>
+        </div>
+      </div>
+      <div class="story-impact">季报不再是"铺数字"——是"这里好，这里有问题，建议这样做"。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Ch6 风险与边界 ── -->
+<section class="slide" id="s6">
+  <div class="ch-header">
+    <div class="ch-num">Chapter 6</div>
+    <h2 class="ch-title">风险与边界</h2>
+  </div>
+  <div class="risks">
+    <div class="risk-card">
+      <div class="risk-title">数据分级</div>
+      <div class="risk-body">预算数据去标识后使用，涉敏数据脱敏处理。分级不是口号，是已在执行的操作原则。</div>
+      <div class="risk-approach">→ 已在做，不是计划</div>
+    </div>
+    <div class="risk-card">
+      <div class="risk-title">核验机制</div>
+      <div class="risk-body">AI生成，关键数字人工比对源数据。速度由AI负责，准确性由人负责。</div>
+      <div class="risk-approach">→ 双轨并行，不偷懒</div>
+    </div>
+    <div class="risk-card">
+      <div class="risk-title">空洞报告陷阱</div>
+      <div class="risk-body">形式合格 ≠ 有观点。AI能生成结构，但判断力仍然是人的事。这个边界需要主动守。</div>
+      <div class="risk-approach">→ 最难守的一条</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Ch7 路线图 ── -->
+<section class="slide" id="s7">
+  <div class="ch-header">
+    <div class="ch-num">Chapter 7</div>
+    <h2 class="ch-title">下一步</h2>
+  </div>
+  <div class="roadmap">
+    <div class="rm-card">
+      <div class="rm-phase">现在 · 个人层</div>
+      <div class="rm-title">固化 + 复利</div>
+      <div class="rm-items">
+        <div class="rm-item"><span class="rm-bullet">▸</span>持续沉淀可复用的skill和workflow</div>
+        <div class="rm-item"><span class="rm-bullet">▸</span>知识库建设，减少重复思考成本</div>
+        <div class="rm-item"><span class="rm-bullet">▸</span>每个跑通的流程都文档化</div>
+      </div>
+    </div>
+    <div class="rm-card">
+      <div class="rm-phase">近期 · 推广层</div>
+      <div class="rm-title">可复制，不依赖个人</div>
+      <div class="rm-items">
+        <div class="rm-item"><span class="rm-bullet">▸</span>区域复盘场景接入（区域老总A方向）</div>
+        <div class="rm-item"><span class="rm-bullet">▸</span>工具链已文档化，可横向复制</div>
+        <div class="rm-item"><span class="rm-bullet">▸</span>前提：工具可及性</div>
+      </div>
+    </div>
+    <div class="rm-card">
+      <div class="rm-phase">远期 · Agent层</div>
+      <div class="rm-title">接入业务流程</div>
+      <div class="rm-items">
+        <div class="rm-item"><span class="rm-bullet">▸</span>销售LTC流程AI化方向</div>
+        <div class="rm-item"><span class="rm-bullet">▸</span>产研团队自助查询 + 主动洞见</div>
+        <div class="rm-item"><span class="rm-bullet">▸</span>数据到决策距离持续压缩</div>
+      </div>
+    </div>
+  </div>
+  <div class="endline">
+    <div class="endline-label">终态</div>
+    <div class="endline-text">目标不是生成更多报告——是缩短数据到决策的距离。</div>
+  </div>
+</section>
+
+<script>
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+    document.getElementById('progress').style.width = pct + '%';
+  });
+
+  // Nav active state
+  const slides = document.querySelectorAll('.slide');
+  const navLinks = document.querySelectorAll('nav a');
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const idx = [...slides].indexOf(e.target);
+        if (navLinks[idx]) navLinks[idx].classList.add('active');
+      }
+    });
+  }, { threshold: 0.5 });
+
+  slides.forEach(s => obs.observe(s));
+
+  // Keyboard nav
+  document.addEventListener('keydown', e => {
+    const cur = [...slides].findIndex(s => {
+      const r = s.getBoundingClientRect();
+      return r.top >= -10 && r.top < window.innerHeight / 2;
+    });
+    if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+      slides[Math.min(cur + 1, slides.length - 1)]?.scrollIntoView({ behavior: 'smooth' });
+    }
+    if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+      slides[Math.max(cur - 1, 0)]?.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+</script>
+</body>
+</html>
