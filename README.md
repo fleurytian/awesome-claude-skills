@@ -278,6 +278,12 @@ awesome-claude-skills/
 
 ---
 
+## 🔧 Related Tools
+
+| Tool | Description |
+|------|-------------|
+| [claude-dash](https://github.com/krabat-l/claude-dash) | Real-time statusline plugin for Claude Code showing context health, quota, cost, cache efficiency, and tool activity |
+
 ## ⭐️ Star History
 
 如果这个项目对你有帮助,欢迎给个Star⭐️!
