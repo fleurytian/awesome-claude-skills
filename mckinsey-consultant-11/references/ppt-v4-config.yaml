@@ -1,0 +1,27 @@
+# McKinsey PPT V4 配置文件
+
+## 配色方案
+PRIMARY_BLUE: "#002960"
+SECONDARY_BLUE: "#0065BD"
+LIGHT_BLUE: "#C9F0FF"
+IKEA_YELLOW: "#FFDB00"
+GRAY: "#808080"
+LIGHT_GRAY: "#F5F5F5"
+WHITE: "#FFFFFF"
+
+## 字号标准
+TITLE: 20pt
+SUBTITLE: 14pt
+BODY: 11pt
+CAPTION: 8-9pt
+
+## 布局参数
+CONTENT_WIDTH: 8.4 inches
+CONTENT_LEFT: 0.8 inches
+FOOTER_Y: 7.15 inches
+
+## 形状规范
+大文本框(>3英寸): RECTANGLE (直角矩形)
+小标签(<1.5英寸): ROUNDED_RECTANGLE (圆角矩形)
+默认边框: None (无边框)
+功能性边框: 1.5-2pt

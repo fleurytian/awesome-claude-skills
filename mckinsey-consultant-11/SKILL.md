@@ -7,17 +7,19 @@ metadata:
   email: fleurytian@gmail.com
   social: 小红书@如宝｜AI&Analytics
   GitHub: fleurytian
-  version: "3.1"
+  version: "4.0"
   last_updated: "2025-10-26"
   architecture: "Progressive Disclosure + Dependency-Aware"
+  dependencies: "mckinsey-ppt-v4 (已内置于 references/)"
 ---
 
-# McKinsey Consultant V3.1
+# McKinsey Consultant V4.0
 
 **架构**: Progressive Disclosure (渐进式披露) + Dependency-Aware (依赖感知)
-**核心升级**: 
+**核心升级**:
 - V3.0: 最小核心 + 按需加载 → 节省70%上下文
 - V3.1: 页面依赖关系标注 → 跨对话续写更智能
+- V4.0: 集成 mckinsey-ppt-v4 迭代式精修方法论 → PPT生成质量从85分到95分
 
 ---
 
@@ -355,10 +357,20 @@ file_read("/mnt/skills/user/mckinsey-consultant/references/page-dependencies.md"
 
 **Claude动作 - 首次执行STEP 6时**:
 ```python
-# 只在开始STEP 6时加载Excel规范
+# 加载Excel规范
 file_read("/mnt/skills/user/mckinsey-consultant/references/excel-data-spec.md")
 
-# 了解Excel数据文件结构
+# 加载PPT V4生成规范(迭代式精修方法论)
+file_read("/mnt/skills/user/mckinsey-consultant/references/ppt-v4-specs.md")
+# 或按需只加载配置:
+file_read("/mnt/skills/user/mckinsey-consultant/references/ppt-v4-config.yaml")
+
+# 了解:
+# - Excel数据文件结构
+# - PPT生成的6类常见问题及解决方案(布局/溢出/颜色/图表/边框/比例)
+# - McKinsey设计铁律(直角矩形/无边框/颜色对比度)
+# - 质量检查清单(生成时+生成后双重检查)
+# - Python-pptx实用工具函数库
 # 用完后释放
 ```
 
@@ -555,17 +567,27 @@ file_read("/mnt/skills/user/mckinsey-consultant/references/delivery-summary.md")
 
 **Claude动作**:
 ```python
-# 只有出现问题时才加载
+# 加载问题排查手册
 file_read("/mnt/skills/user/mckinsey-consultant/references/troubleshooting.md")
 
-# 了解常见问题和解决方案
+# 如果涉及PPT视觉问题,加载V4迭代优化方法论
+file_read("/mnt/skills/user/mckinsey-consultant/references/ppt-v4-specs.md")
+# 快速参考:
+file_read("/mnt/skills/user/mckinsey-consultant/references/ppt-v4-checklist.md")
+
+# 了解:
+# - V4迭代式优化工作流(5轮迭代: 初稿→识别→修复→拆分→打磨)
+# - 6类问题的精确解决方案
+# - 批量检查和自动修复函数
 # 针对性修复
 ```
 
-**优化重点**:
-- 颜色对比度(深蓝背景→白色文字)
-- 信息密度(50-70字符/平方英寸)
-- 元素遮挡/文字溢出
+**优化重点** (V4方法论):
+- 颜色对比度(深蓝背景→白色文字) — 头号问题,强制规则
+- 信息密度(50-70字符/平方英寸) — 超标则拆页而非压缩
+- 元素遮挡/文字溢出 — 重建而非修补
+- McKinsey形状规范 — 大文本框直角矩形,无边框为常态
+- 图表标签空间 — 预留0.35英寸+
 
 ---
 
@@ -577,19 +599,20 @@ file_read("/mnt/skills/user/mckinsey-consultant/references/troubleshooting.md")
 结果: 上下文快速消耗，生成10-15页就困难
 ```
 
-### V3.0优化:
+### V4.0优化 (含ppt-v4集成):
 ```
 初始加载: SKILL.md核心(~300行)
 
 STEP 1: 无需额外加载
 STEP 2-3: 临时加载methodology.md → 用完释放
-STEP 4-5: 临时加载layouts.md + design-specs.md → 用完释放
-STEP 6-7: 临时加载excel-data-spec.md → 用完释放
+STEP 4-5: 临时加载layouts.md + design-specs.md + page-dependencies.md → 用完释放
+STEP 6-7: 临时加载excel-data-spec.md + ppt-v4-specs.md → 用完释放
         + 逐页处理(每次只5个搜索结果)
+        + 每页自检使用ppt-v4-checklist.md
 STEP 8: 按需加载delivery-summary.md
-STEP 9: 按需加载troubleshooting.md
+STEP 9: 按需加载troubleshooting.md + ppt-v4-specs.md(迭代优化方法论)
 
-结果: 上下文消耗降低70%+，可稳定生成20-25页
+结果: 上下文消耗降低70%+，PPT质量从85分提升到95分
 ```
 
 ### Claude执行原则:
@@ -620,8 +643,12 @@ Claude根据当前STEP，按需读取:
 | `methodology.md` | MECE、Issue Tree、Hypotheses方法论 | STEP 2-3首次执行 |
 | `layouts.md` | 7种McKinsey页面布局库 | STEP 4-5首次执行 |
 | `design-specs.md` | 配色、字号、信息密度规范 | STEP 4-5首次执行 |
-| `page-dependencies.md` | 页面依赖关系标注规范 ⭐ 新增 | STEP 4-5首次执行 |
+| `page-dependencies.md` | 页面依赖关系标注规范 | STEP 4-5首次执行 |
 | `excel-data-spec.md` | Excel数据文件结构规范 | STEP 6首次执行 |
+| `ppt-v4-specs.md` | **PPT V4迭代式精修方法论** (原mckinsey-ppt-v4) | STEP 6首次执行 + STEP 9 |
+| `ppt-v4-config.yaml` | PPT配色/字号/布局参数常量 | STEP 6按需 |
+| `ppt-v4-checklist.md` | PPT V4终极检查清单 | STEP 6-7每页自检 + STEP 9 |
+| `ppt-v4-quickref.md` | PPT V4快速参考卡 | 按需速查 |
 | `delivery-summary.md` | Word报告结构和格式 | STEP 8用户要求时 |
 | `troubleshooting.md` | 常见问题和解决方案 | STEP 9遇到问题时 |
 | `quick-guide.md` | 快速参考和介绍 | 用户首次询问时 |
@@ -679,16 +706,17 @@ file_read(excel-data-spec.md)  # 按需加载
 
 ## 🎓 开发者说明
 
-**版本**: V3.0 - Progressive Disclosure Architecture
+**版本**: V4.0 - Progressive Disclosure + PPT V4 Integration
 **作者**: Qianru Tian (fleurytian@gmail.com)
 **关注**: 小红书@如宝｜AI&Analytics
 **背景**: 前麦肯锡中国咨询顾问 + AI产品经理
 
-**V3.0核心升级**:
+**V4.0核心升级**:
 1. **渐进式披露**: 从1130行压缩到~300行核心
 2. **按需加载**: Claude主动`file_read`所需文档
 3. **上下文优化**: 用完即释放，降低70%+消耗
 4. **稳定性提升**: 可稳定生成20-25页PPT
+5. **PPT V4集成**: 迭代式精修方法论，6类问题解决方案，质量双重检查，Python工具函数库
 
 **反馈与建议**: fleurytian@gmail.com
 

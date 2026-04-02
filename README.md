@@ -19,14 +19,18 @@ awesome-claude-skills/
 ├── README.md                          # 本文件
 ├── mckinsey-sample-PPT.pptx          # McKinsey Skill示例输出
 ├── mimeng-sample.md                   # 咪蒙 Skill示例输出
-├── mckinsey-consultant/
-│   ├── SKILL.md                      # Skill主文件
-│   ├── references/                    # 参考文档
+├── mckinsey-consultant-11/
+│   ├── SKILL.md                      # Skill主文件 (V4.0, 含ppt-v4)
+│   ├── references/                    # 参考文档 (按需加载)
 │   │   ├── methodology.md            # 详细方法论
 │   │   ├── layouts.md                # McKinsey页面布局
 │   │   ├── design-specs.md           # 设计规范
+│   │   ├── ppt-v4-specs.md           # ⭐ PPT V4生成规范
+│   │   ├── ppt-v4-config.yaml        # ⭐ PPT配色/布局参数
 │   │   ├── examples.md               # 完整案例
 │   │   └── troubleshooting.md        # 常见问题
+│   ├── examples/                      # 代码示例
+│   │   └── basic_usage.py            # Python-pptx用法
 │   └── README.md                     # Skill说明
 ├── mimeng-writing/
 │   ├── SKILL.md                      # Skill主文件
