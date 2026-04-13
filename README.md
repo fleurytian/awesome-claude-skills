@@ -279,6 +279,7 @@ awesome-claude-skills/
 - 咪蒙文章的创作灵感
 - 美联储FRED数据库的开放数据
 - 所有提供反馈和建议的用户
+- [CCHub](https://github.com/Moresl/cchub) - A desktop control panel for the Claude Code / Codex / Gemini CLI ecosystem. Manage MCP servers, config profiles, agent skills, CLAUDE.md, hooks, and workflow templates from a single Tauri app (Windows / macOS / Linux).
 
 ---
 
