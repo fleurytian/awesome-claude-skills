@@ -262,6 +262,12 @@ awesome-claude-skills/
 
 ---
 
+## Related MCP resources
+
+- [Helium MCP](https://github.com/connerlambden/helium-mcp) — Remote MCP server for market intelligence, ML options pricing, and news bias analysis across 5,000+ sources. Free tier, no API key. [Documentation](https://heliumtrades.com/mcp).
+
+---
+
 ## 📬 联系方式
 
 - **GitHub**: [@fleurytian](https://github.com/fleurytian)
