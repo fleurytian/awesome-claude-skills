@@ -10,6 +10,8 @@
 精选高质量Claude Skills集合 | 专注商业分析与内容创作
 
 </div>
+${ASB}
+- [Omni Skills Forge](https://github.com/theihtisham/omni-skills-forge) - 50,000+ curated AI agent skills for Claude Code, Cursor, Copilot, Windsurf, Cline. Visual dashboard, one-click install, skill doctor, auto-update.
 ---
 
 ## 📂 仓库结构
