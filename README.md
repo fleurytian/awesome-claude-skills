@@ -199,7 +199,45 @@ awesome-claude-skills/
 
 ---
 
-### 3️⃣ US Government Shutdown Tracker Skill
+### 3️⃣ find-session Skill
+**精确锁定并一键 resume 某个特定的 Claude Code 对话**
+
+`claude --continue` 只能"按目录最近一次"挑会话,在长时间多对话并行时经常选错。这个 skill 帮你用 grep 验证某段对话的真正 UUID,然后写到 `~/.zshrc` 当 shell function — 以后任何新 terminal 打一个词就回到那个对话。
+
+#### 💡 解决的问题
+
+- 多个长期对话并行时,`claude --continue` 选错
+- 多个 Claude Code 进程可能"声称"同一 UUID,只能靠 grep 独特字符串验证
+- Session 是按"启动时 cwd"索引的,不是按"工作目录" — alias 要 `cd "$HOME"` 才能找到 home-dir bucket 里的会话
+
+#### 🚀 快速开始
+
+```
+"我找不到我的对话,帮我找出来"
+```
+
+或显式触发:
+
+```
+/find-session
+```
+
+Skill 会按步骤问你独特内容(文件名 / URL / 函数名),grep 所有 jsonl 找匹配,然后让你起个短名(如 `aichain` / `headsup`),自动写到 `~/.zshrc`。
+
+#### 📝 几条关键经验
+
+- **最大的 jsonl 不一定是你的** — 必须靠 grep 实际内容验证
+- **`cd "$HOME"`** 因为 session 按启动 cwd 索引,不是工作目录
+- **多个并发 session** 时,两个 Claude 实例可能都声称同一 UUID — 只能靠 grep 唯一内容辨认
+
+适合:
+- 工作 / 研究类长期会话(几天到几周一直在跟同一个 Claude 聊)
+- 跨项目混合会话(home 目录起的会话占多数)
+- 重装系统 / 换电脑后想找回之前的对话
+
+---
+
+### 4️⃣ US Government Shutdown Tracker Skill
 **美国政府停摆流动性分析器**
 
 实时追踪和分析美国政府停摆对金融市场流动性影响的专业工具,基于FRED数据提供自动化分析。
