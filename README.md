@@ -339,3 +339,5 @@ Skill 会按步骤问你独特内容(文件名 / URL / 函数名),grep 所有 js
 *让AI更懂商业,让内容更有温度*
 
 </div>
+
+- **[Context Kit](https://github.com/JDDavenport/context-kit)** — Personal Context Artifacts: 4 Markdown templates (wiki, mental-models, voice, protocols) + 5 Claude Code skills. Solves context amnesia — every session starts context-full. MIT, one-command install.
