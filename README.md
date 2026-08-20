@@ -320,6 +320,12 @@ Skill 会按步骤问你独特内容(文件名 / URL / 函数名),grep 所有 js
 
 ---
 
+## 🔗 相关资源
+
+- [awesome-claude-code-hooks](https://github.com/loqimean/awesome-claude-code-hooks) - Claude Code hooks 精选资源列表
+
+---
+
 ## ⭐️ Star History
 
 如果这个项目对你有帮助,欢迎给个Star⭐️!
